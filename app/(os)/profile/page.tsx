@@ -335,7 +335,7 @@ export default function ProfilePage() {
             ].map((s) => (
               <div key={s.l}>
                 <div
-                  className={`${display.className} mb-3 text-6xl font-light tracking-[-0.04em] ${
+                  className={`${display.className} mb-3 text-5xl font-light tracking-[-0.04em] md:text-6xl ${
                     s.accent ? "text-[#E43D12]" : "text-[#2A1610]"
                   }`}
                   style={WONKY}
