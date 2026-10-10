@@ -264,7 +264,7 @@ const LEDGER_ACTIVE_COUNT = OPERATIONAL_HISTORY.filter(entryIsActive).length;
 
 /* Title scale by rank: newest role is loudest, earlier roles recede. */
 const ROLE_RANK_STYLES = [
-  "text-[1.7rem] italic text-[#E43D12] md:text-[2.2rem]",
+  "text-[1.6rem] italic text-[#E43D12] md:text-4xl",
   "text-[1.35rem] text-[#2A1610] md:text-[1.7rem]",
   "text-[1.15rem] text-[#2A1610]/60 md:text-[1.4rem]",
 ];
@@ -429,7 +429,7 @@ function LedgerProgression({ entry }: { entry: ProgressionEntry }) {
                       {roleLive ? " · Current" : ""}
                     </p>
                     <h5
-                      className={`${display.className} mt-3 break-words font-light leading-[1.1] tracking-[-0.03em] ${rank}`}
+                      className={`${display.className} mt-3 break-words hyphens-auto font-light leading-[1.1] tracking-[-0.03em] ${rank}`}
                       style={WONKY}
                     >
                       {role.title}
