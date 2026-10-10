@@ -153,7 +153,7 @@ function Mask({
   const y = useTransform(p, [from, to], ["108%", "0%"]);
   return (
     <div className={`-mb-[0.12em] overflow-hidden pb-[0.12em] ${className}`}>
-      <motion.div style={{ y }}>{children}</motion.div>
+      <motion.div style={{ y }} className="will-change-transform">{children}</motion.div>
     </div>
   );
 }
@@ -226,7 +226,7 @@ function Ticker() {
         WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
       }}
     >
-      <motion.div style={{ x }} className="flex w-max items-center gap-10">
+      <motion.div style={{ x }} className="flex w-max items-center gap-10 will-change-transform">
         {items.map((r, i) => (
           <span key={`${r.id}-${i}`} className="flex items-center gap-10">
             <span
@@ -275,7 +275,7 @@ function RecordRow({ r }: { r: (typeof RECORDS)[number] }) {
 
       {/* column 1 — record number (REMOVED DECISION TEXT HERE) */}
       <div className="flex flex-col gap-3 min-w-0 pt-2">
-        <motion.div style={{ y: numDrift }}>
+        <motion.div style={{ y: numDrift }} className="will-change-transform">
           <div className="overflow-hidden pb-[0.08em] pr-[0.1em]">
             <motion.p
               style={{ y: numY, ...WONKY }}
@@ -311,13 +311,13 @@ function RecordRow({ r }: { r: (typeof RECORDS)[number] }) {
 
       {/* column 3 — the honest part */}
       <div className="flex flex-col gap-7 md:col-span-2 lg:col-span-1 min-w-0">
-        <motion.div style={{ clipPath: costWipe, x: costX }}>
+        <motion.div style={{ clipPath: costWipe, x: costX }} className="will-change-transform">
           <p className={`${mono.className} mb-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#D6536D]`}>
             What it costs me
           </p>
           <p className="text-[14px] leading-relaxed text-[#2A1610]/70">{r.cost}</p>
         </motion.div>
-        <motion.div style={{ clipPath: practiceWipe, x: practiceX }}>
+        <motion.div style={{ clipPath: practiceWipe, x: practiceX }} className="will-change-transform">
           <p className={`${mono.className} mb-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#D6536D]`}>
             In practice
           </p>
@@ -424,7 +424,7 @@ export default function ArchitecturePage() {
             {/* the four records + progress rail */}
             <div ref={bodyRef} className="relative">
               <div aria-hidden className="absolute -left-5 bottom-0 top-0 w-px bg-[#2A1610]/15 sm:-left-8">
-                <motion.div style={{ scaleY: railP, originY: 0 }} className="h-full w-px bg-[#E43D12]" />
+                <motion.div style={{ scaleY: railP, originY: 0 }} className="h-full w-px bg-[#E43D12] will-change-transform" />
                 <motion.span
                   style={{ top: dotTop }}
                   className="absolute -left-[3px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-[#E43D12] shadow-[0_0_10px_rgba(228,61,18,0.6)]"

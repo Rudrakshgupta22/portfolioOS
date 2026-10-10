@@ -188,11 +188,11 @@ function Compass({
 
   return (
     <div className="relative aspect-square w-[min(74vh,34rem)]">
-      <motion.div style={{ rotate: dialRotate }} className="absolute inset-0">
+      <motion.div style={{ rotate: dialRotate }} className="absolute inset-0 will-change-transform">
         <Dial />
       </motion.div>
 
-      <motion.div style={{ rotate: needleRotate }} className="absolute inset-[6%]">
+      <motion.div style={{ rotate: needleRotate }} className="absolute inset-[6%] will-change-transform">
         <Needle />
       </motion.div>
 
@@ -294,7 +294,7 @@ export default function ProfilePage() {
                 <motion.div
                   key={block.num}
                   style={{ opacity: opacities[i], y: ys[i] }}
-                  className="absolute left-0 top-1/2 right-0 -translate-y-1/2"
+                  className="absolute left-0 top-1/2 right-0 -translate-y-1/2 will-change-transform"
                 >
                   <h2
                     className={`${mono.className} mb-6 flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.22em] text-[#D6536D]`}
@@ -374,7 +374,7 @@ export default function ProfilePage() {
                     transition={{ duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
                     className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-white/40 p-8 shadow-[0_20px_40px_-10px_rgba(228,61,18,0.05),inset_0_1px_2px_rgba(255,255,255,0.8)] backdrop-blur-xl transition-all hover:bg-white/50 sm:p-10"
                   >
-                    <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#E43D12]/5 blur-3xl" />
+                    <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#E43D12]/5 blur-xl md:blur-3xl" />
 
                     <div className="relative z-10 mb-10">
                       <div className="mb-4 flex items-center gap-4">

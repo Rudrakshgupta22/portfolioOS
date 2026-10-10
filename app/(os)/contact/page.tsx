@@ -511,7 +511,7 @@ export default function ContactPage() {
       <section className="relative z-10 px-6 md:px-0">
         <div className="relative mx-auto max-w-6xl">
           {/* Ambient light flare for depth */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E43D12]/5 blur-[80px]" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E43D12]/5 blur-[40px] md:blur-[80px]" />
 
           <div className="relative flex items-end justify-between">
             <SectionTag n="01">Where to find me</SectionTag>

@@ -31,7 +31,7 @@ export default function OperatorProfile() {
         <motion.div 
           animate={{ top: ["0%", "100%", "0%"] }}
           transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          className="absolute left-0 right-0 h-[1px] bg-[#E43D12]/50 shadow-[0_0_15px_rgba(228,61,18,0.8)] z-10"
+          className="absolute left-0 right-0 h-[1px] bg-[#E43D12]/50 shadow-[0_0_15px_rgba(228,61,18,0.8)] z-10 will-change-transform"
         />
 
         {/* Floating HUD Badge (Like the 'Systems Online' badge) */}
