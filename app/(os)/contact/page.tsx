@@ -170,7 +170,7 @@ function LocalTime() {
 function SectionTag({ n, children }: { n: string; children: ReactNode }) {
   return (
     <p className={`${mono.className} mb-10 flex items-center gap-4 text-[10px] font-medium uppercase tracking-[0.25em] text-[#D6536D]`}>
-      <span className="text-[#E43D12]">( {n} )</span>
+      <span className="shrink-0 whitespace-nowrap text-[#E43D12]">( {n} )</span>
       {children}
     </p>
   );
@@ -209,11 +209,11 @@ function InlineLink({
         href={link.href}
         target={link.external ? "_blank" : undefined}
         rel={link.external ? "noopener noreferrer" : undefined}
-        className="group/il relative inline-block italic text-[#E43D12]"
+        className="group/il relative inline break-all italic text-[#E43D12] underline decoration-[#E43D12] underline-offset-4 md:inline-block md:no-underline"
       >
         <span
           aria-hidden
-          className="absolute -inset-x-2 inset-y-[0.08em] origin-left scale-x-0 rounded-lg bg-[#E43D12]/10 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/il:scale-x-100"
+          className="absolute -inset-x-2 inset-y-[0.08em] hidden origin-left scale-x-0 rounded-lg bg-[#E43D12]/10 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/il:scale-x-100 md:block"
         />
         <span className="relative">
           {link.label}
@@ -228,7 +228,7 @@ function InlineLink({
           aria-hidden
           viewBox="0 0 100 8"
           preserveAspectRatio="none"
-          className="absolute -bottom-[0.06em] left-0 h-[0.16em] w-full overflow-visible"
+          className="absolute -bottom-[0.06em] left-0 hidden h-[0.16em] w-full overflow-visible md:block"
         >
           <motion.path
             d="M0 4 Q 12 0 25 4 T 50 4 T 75 4 T 100 4"
