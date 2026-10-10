@@ -9,6 +9,7 @@ export default function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isView, setIsView] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
@@ -18,6 +19,25 @@ export default function CustomCursor() {
   const cursorY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px) and (pointer: fine)");
+
+    const updateDesktopState = () => {
+      const shouldEnable = mediaQuery.matches;
+      setIsDesktop(shouldEnable);
+      if (!shouldEnable) {
+        setIsVisible(false);
+        setIsHovering(false);
+        setIsView(false);
+      }
+    };
+
+    updateDesktopState();
+    mediaQuery.addEventListener("change", updateDesktopState);
+
+    if (!mediaQuery.matches) {
+      return () => mediaQuery.removeEventListener("change", updateDesktopState);
+    }
+
     const moveCursor = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -26,13 +46,13 @@ export default function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      
+
       if (target.closest("[data-cursor]")) {
         setIsHovering(true);
         setIsView(true);
       } else if (
-        target.closest("a") || 
-        target.closest("button") || 
+        target.closest("a") ||
+        target.closest("button") ||
         window.getComputedStyle(target).cursor === "pointer"
       ) {
         setIsHovering(true);
@@ -47,14 +67,17 @@ export default function CustomCursor() {
     window.addEventListener("mouseover", handleMouseOver);
 
     return () => {
+      mediaQuery.removeEventListener("change", updateDesktopState);
       window.removeEventListener("mousemove", moveCursor);
       window.removeEventListener("mouseover", handleMouseOver);
     };
-  }, [mouseX, mouseY, isVisible]);
+  }, [isVisible, mouseX, mouseY]);
+
+  if (!isDesktop) return null;
 
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[999] flex items-center justify-center"
+      className="hidden md:block pointer-events-none fixed top-0 left-0 z-[999] flex items-center justify-center"
       style={{
         x: cursorX,
         y: cursorY,
