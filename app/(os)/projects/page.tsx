@@ -2,11 +2,20 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { JetBrains_Mono } from "next/font/google";
+import { Fraunces, Martian_Mono } from "next/font/google";
 import { portfolioData } from "@/lib/intel";
 import { CursorPreviewProvider, useCursorPreview } from "@/components/CursorPreview";
 
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+/* ── FONT SYSTEM ── */
+const display = Fraunces({
+  subsets: ["latin"],
+  axes: ["SOFT", "WONK", "opsz"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+const mono = Martian_Mono({ subsets: ["latin"], weight: ["400", "500", "700"], display: "swap" });
+
+const WONKY = { fontVariationSettings: '"SOFT" 100, "WONK" 1' } as const;
 
 /* ── NEW POP THEME GRADIENTS ── */
 const coverStyles = [
@@ -26,9 +35,12 @@ function ProjectsContent() {
           Deployment / Portfolio
         </p>
 
-        {/* Deep Espresso to Vibrant Orange Pop Gradient */}
-        <h1 className="mt-8 text-[clamp(2.5rem,5.5vw,5.5rem)] font-extrabold uppercase leading-[0.95] tracking-tighter md:ml-[16%] md:max-w-[56vw] bg-gradient-to-br from-[#2A1610] to-[#E43D12] text-transparent bg-clip-text">
-          Production systems and experiments.
+        {/* Updated to Fraunces Espresso */}
+        <h1 
+          className={`${display.className} mt-8 text-[clamp(2.5rem,5.5vw,5.5rem)] font-light leading-[0.95] tracking-[-0.02em] md:ml-[16%] md:max-w-[56vw] text-[#2A1610]`}
+          style={WONKY}
+        >
+          Production systems & experiments.
         </h1>
       </section>
 
@@ -38,7 +50,6 @@ function ProjectsContent() {
             <Link
               key={mission.id}
               href={`/project/${mission.id}`}
-              /* ── NEW: cursor pop-up logic preserved ── */
               data-cursor="View"
               onMouseEnter={() =>
                 show({
@@ -65,7 +76,10 @@ function ProjectsContent() {
                 </div>
 
                 <div className="relative mt-36 flex min-h-[170px] items-end">
-                  <h2 className="max-w-[90%] text-[clamp(2rem,3vw,3.2rem)] font-extrabold uppercase leading-[0.95] tracking-tighter text-[#2A1610]">
+                  <h2 
+                    className={`${display.className} max-w-[90%] text-[clamp(2rem,3vw,3.2rem)] font-normal leading-[0.95] tracking-[-0.02em] text-[#2A1610]`}
+                    style={WONKY}
+                  >
                     {mission.title}
                   </h2>
                 </div>
@@ -73,7 +87,10 @@ function ProjectsContent() {
 
               {/* Card Metadata Area */}
               <div className="mt-6 px-2">
-                <h3 className="text-[clamp(1.5rem,2vw,2.2rem)] font-extrabold uppercase tracking-tighter text-[#E43D12]">
+                <h3 
+                  className={`${display.className} text-[clamp(1.5rem,2vw,2.2rem)] font-normal tracking-[-0.02em] text-[#E43D12]`}
+                  style={WONKY}
+                >
                   {mission.title}
                 </h3>
                 <div className="mt-4 h-px w-full bg-[#E43D12]/15" />
