@@ -212,6 +212,281 @@ function Compass({
   );
 }
 
+/* ───────────────── OPERATIONAL LEDGER (EXPERIENCE) ───────────────── */
+type LedgerRole = { title: string; time: string };
+type ProgressionEntry = { company: string; type: "progression"; roles: LedgerRole[] };
+type SingleEntry = { company: string; type: "single"; title: string; time: string };
+type LedgerEntry = ProgressionEntry | SingleEntry;
+
+const OPERATIONAL_HISTORY: LedgerEntry[] = [
+  { company: "ExCoLearn Pvt. Ltd.", type: "progression", roles: [{ title: "Chief Innovation Officer", time: "Sep 2026—Present" }, { title: "Team Lead", time: "Feb 2026—Sep 2026" }, { title: "Digital Marketing Executive", time: "Oct 2025—Feb 2026" }] },
+  { company: "Google Student Ambassadors (India)", type: "single", title: "Google Student Ambassador", time: "May 2026—Present" },
+  { company: "Amazon Web Services (AWS)", type: "single", title: "Student Builder Campus Leader", time: "Jul 2026—Sep 2026" },
+  { company: "ElevanceSkills", type: "single", title: "Full Stack Development Intern", time: "Apr 2026—Jul 2026" },
+  { company: "Universal AI Toastmasters Club", type: "single", title: "VP Public Relations", time: "Feb 2026—Present" }
+];
+
+const LEDGER_EASE = [0.22, 1, 0.36, 1] as const;
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/* Everything below is derived from the data, nothing is hardcoded per entry. */
+function splitTime(time: string) {
+  const [from = "", to = ""] = time.split("—").map((s) => s.trim());
+  return { from, to };
+}
+
+function isPresent(time: string) {
+  return /present/i.test(splitTime(time).to);
+}
+
+function monthIndex(label: string) {
+  const [m, y] = label.split(" ");
+  const mi = MONTH_NAMES.indexOf(m);
+  const yr = Number(y);
+  return mi < 0 || !yr ? null : yr * 12 + mi;
+}
+
+function tenureLabel(time: string) {
+  const { from, to } = splitTime(time);
+  const a = monthIndex(from);
+  const b = monthIndex(to);
+  if (a === null || b === null || b < a) return null;
+  return `${String(b - a).padStart(2, "0")} mos`;
+}
+
+function entryIsActive(entry: LedgerEntry) {
+  return entry.type === "progression"
+    ? entry.roles.some((r) => isPresent(r.time))
+    : isPresent(entry.time);
+}
+
+const LEDGER_ACTIVE_COUNT = OPERATIONAL_HISTORY.filter(entryIsActive).length;
+
+/* Title scale by rank: newest role is loudest, earlier roles recede. */
+const ROLE_RANK_STYLES = [
+  "text-[1.7rem] italic text-[#E43D12] md:text-[2.2rem]",
+  "text-[1.35rem] text-[#2A1610] md:text-[1.7rem]",
+  "text-[1.15rem] text-[#2A1610]/60 md:text-[1.4rem]",
+];
+
+function LedgerNode({ active, className = "" }: { active: boolean; className?: string }) {
+  return (
+    <div
+      className={`absolute left-[15px] z-10 flex h-4 w-4 items-center justify-center rounded-full border border-[#E43D12] bg-[#EBE9E1] ${
+        active ? "shadow-[0_0_15px_rgba(228,61,18,0.55)]" : "shadow-[0_0_10px_rgba(228,61,18,0.3)]"
+      } ${className}`}
+    >
+      {active && <span className="absolute inset-0 animate-ping rounded-full bg-[#E43D12]/40" />}
+      <span
+        className={`relative h-1.5 w-1.5 rounded-full ${
+          active ? "bg-[#E43D12]" : "border border-[#E43D12] bg-transparent"
+        }`}
+      />
+    </div>
+  );
+}
+
+function LedgerTime({ time }: { time: string }) {
+  const { from, to } = splitTime(time);
+  const live = isPresent(time);
+  const tenure = tenureLabel(time);
+  return (
+    <p
+      className={`${mono.className} flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#2A1610]/60`}
+    >
+      <span>{from}</span>
+      <span className="text-[#E43D12]">→</span>
+      <span className={live ? "text-[#E43D12]" : ""}>{to}</span>
+      {live ? (
+        <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-[#E43D12]/20 bg-[#E43D12]/5 px-2 py-0.5 text-[8px] font-bold tracking-[0.2em] text-[#E43D12]">
+          <span className="h-1 w-1 animate-pulse rounded-full bg-[#E43D12]" />
+          Live
+        </span>
+      ) : tenure ? (
+        <span className="text-[#2A1610]/35">· {tenure}</span>
+      ) : null}
+    </p>
+  );
+}
+
+/* Minimal text node that branches off the main spine. */
+function LedgerSingle({ entry, index }: { entry: SingleEntry; index: number }) {
+  const live = isPresent(entry.time);
+  return (
+    <motion.div
+      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, x: -20 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.8, ease: LEDGER_EASE }}
+      className="group relative pl-16 md:pl-24"
+    >
+      <LedgerNode active={live} className="top-px" />
+
+      {/* branch from spine to text */}
+      <span
+        aria-hidden
+        className="absolute left-[31px] top-2 h-px w-5 bg-[#E43D12]/30 transition-all duration-500 group-hover:w-8 group-hover:bg-[#E43D12] md:w-8 md:group-hover:w-14"
+      />
+
+      {/* ledger entry number */}
+      <span
+        aria-hidden
+        className={`${display.className} pointer-events-none absolute right-0 top-0 hidden select-none text-[5rem] font-light leading-none tracking-[-0.05em] text-[#E43D12]/[0.07] md:block`}
+        style={WONKY}
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
+      <LedgerTime time={entry.time} />
+      <h4
+        className={`${display.className} mt-4 break-words text-[1.6rem] font-light leading-[1.1] tracking-[-0.03em] text-[#2A1610] transition-colors duration-500 group-hover:text-[#E43D12] sm:text-[2rem] md:text-[2.5rem]`}
+        style={WONKY}
+      >
+        {entry.title}
+      </h4>
+      <p className={`${mono.className} mt-3 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D6536D]`}>
+        {entry.company}
+      </p>
+    </motion.div>
+  );
+}
+
+/* Frosted card with a nested promotion ladder inside it. */
+function LedgerProgression({ entry }: { entry: ProgressionEntry }) {
+  const live = entry.roles.some((r) => isPresent(r.time));
+  const promotions = entry.roles.length - 1;
+  return (
+    <motion.div
+      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, x: -20 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.8, ease: LEDGER_EASE }}
+      className="relative pl-16 md:pl-24"
+    >
+      <LedgerNode active={live} className="top-8" />
+
+      <div className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-white/40 p-8 shadow-[0_20px_40px_-10px_rgba(228,61,18,0.05),inset_0_1px_2px_rgba(255,255,255,0.8)] backdrop-blur-xl transition-all hover:bg-white/50 sm:p-10">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#E43D12]/5 blur-xl md:blur-3xl" />
+
+        <div className="relative z-10">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <span
+              className={`${mono.className} rounded-full border border-[#E43D12]/20 bg-[#E43D12]/5 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#E43D12]`}
+            >
+              Promotion Track
+            </span>
+            <span
+              className={`${mono.className} text-[9px] font-medium uppercase tracking-[0.18em] text-[#D6536D]`}
+            >
+              {String(promotions).padStart(2, "0")} Promotions · {String(entry.roles.length).padStart(2, "0")} Levels
+            </span>
+          </div>
+          <h4
+            className={`${display.className} break-words text-[1.6rem] font-normal tracking-[-0.03em] text-[#2A1610] sm:text-[2rem] md:text-[2.5rem]`}
+            style={WONKY}
+          >
+            {entry.company}
+          </h4>
+        </div>
+
+        {/* nested ladder: newest level on top */}
+        <div className="relative z-10 mt-12 flex flex-col gap-10">
+          <div
+            aria-hidden
+            className="absolute bottom-3 left-[7px] top-3 w-px bg-gradient-to-b from-[#E43D12] via-[#E43D12]/40 to-[#E43D12]/10"
+          />
+
+          {entry.roles.map((role, i) => {
+            const roleLive = isPresent(role.time);
+            const rank = ROLE_RANK_STYLES[Math.min(i, ROLE_RANK_STYLES.length - 1)];
+            const prev = entry.roles[i + 1];
+            return (
+              <motion.div
+                key={role.title}
+                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.7, delay: 0.15 + i * 0.15, ease: LEDGER_EASE }}
+                className="relative pl-10"
+              >
+                <span
+                  className={`absolute left-0 top-0 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#E43D12] bg-[#EBE9E1] ${
+                    roleLive ? "shadow-[0_0_14px_rgba(228,61,18,0.6)]" : "shadow-[0_0_8px_rgba(228,61,18,0.25)]"
+                  }`}
+                >
+                  {roleLive && <span className="absolute inset-0 animate-ping rounded-full bg-[#E43D12]/40" />}
+                  <span
+                    className={`relative h-1.5 w-1.5 rounded-full ${roleLive ? "bg-[#E43D12]" : "bg-[#E43D12]/40"}`}
+                  />
+                </span>
+
+                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:gap-8">
+                  <div>
+                    <p
+                      className={`${mono.className} text-[9px] font-bold uppercase tracking-[0.22em] text-[#D6536D]`}
+                    >
+                      Level {String(entry.roles.length - i).padStart(2, "0")}
+                      {roleLive ? " · Current" : ""}
+                    </p>
+                    <h5
+                      className={`${display.className} mt-3 break-words font-light leading-[1.1] tracking-[-0.03em] ${rank}`}
+                      style={WONKY}
+                    >
+                      {role.title}
+                    </h5>
+                    {prev && (
+                      <p
+                        className={`${mono.className} mt-3 flex items-center gap-2 text-[9px] font-medium uppercase tracking-[0.18em] text-[#E43D12]`}
+                      >
+                        <span aria-hidden>↑</span>
+                        Promoted from {prev.title}
+                      </p>
+                    )}
+                  </div>
+                  <LedgerTime time={role.time} />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function OperationalLedger() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.75", "end 0.5"] });
+  const headTop = useTransform(scrollYProgress, (v) => `${Math.min(Math.max(v, 0), 1) * 100}%`);
+
+  return (
+    <div ref={ref} className="relative flex flex-col gap-14 pb-4">
+      {/* continuous 1px spine */}
+      <div aria-hidden className="absolute bottom-0 left-[23px] top-0 w-px bg-[#E43D12]/20" />
+      {/* scroll-lit portion of the spine */}
+      <motion.div
+        aria-hidden
+        style={{ scaleY: scrollYProgress }}
+        className="absolute bottom-0 left-[23px] top-0 w-px origin-top bg-[#E43D12] shadow-[0_0_10px_rgba(228,61,18,0.7)]"
+      />
+      {/* glowing head that travels down the spine */}
+      <motion.div
+        aria-hidden
+        style={{ top: headTop }}
+        className="absolute left-[21px] -mt-[3px] h-[5px] w-[5px] rounded-full bg-[#E43D12] shadow-[0_0_14px_4px_rgba(228,61,18,0.6)]"
+      />
+
+      {OPERATIONAL_HISTORY.map((entry, i) =>
+        entry.type === "progression" ? (
+          <LedgerProgression key={entry.company} entry={entry} />
+        ) : (
+          <LedgerSingle key={entry.company} entry={entry} index={i} />
+        )
+      )}
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   // Master container ref that dictates the GSAP ScrollTrigger "pin" equivalent
   const trackRef = useRef<HTMLElement>(null);
@@ -430,6 +705,25 @@ export default function ProfilePage() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* ───────── 3B. OPERATIONAL LEDGER ───────── */}
+          <div className="pt-32">
+            <div className="mb-16 flex flex-wrap items-end justify-between gap-4">
+              <h3
+                className={`${mono.className} text-[10px] font-medium uppercase tracking-[0.25em] text-[#D6536D]`}
+              >
+                Operational Ledger &amp; Experience
+              </h3>
+              <p
+                className={`${mono.className} text-[9px] font-medium uppercase tracking-[0.2em] text-[#2A1610]/45`}
+              >
+                {String(OPERATIONAL_HISTORY.length).padStart(2, "0")} Entries ·{" "}
+                {String(LEDGER_ACTIVE_COUNT).padStart(2, "0")} Active
+              </p>
+            </div>
+
+            <OperationalLedger />
           </div>
         </div>
       </section>
