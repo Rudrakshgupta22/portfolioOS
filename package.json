@@ -9,9 +9,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.91",
+    "ai": "^7.0.137",
+    "framer-motion": "^14.0.0",
+    "lucide-react": "^1.54.0",
     "next": "16.4.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "react-icons": "^5.7.0",
+    "resend": "^6.32.1",
+    "unicornstudio-react": "^2.2.13"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
