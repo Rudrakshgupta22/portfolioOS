@@ -385,7 +385,7 @@ export default function ProfilePage() {
                         </span>
                       </div>
                       <h4
-                        className={`${display.className} text-3xl font-normal tracking-[-0.03em] text-[#2A1610] md:text-[2.5rem]`}
+                        className={`${display.className} break-words text-[1.6rem] font-normal tracking-[-0.03em] text-[#2A1610] sm:text-[2rem] md:text-[2.5rem]`}
                         style={WONKY}
                       >
                         {node.title}
