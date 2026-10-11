@@ -7,9 +7,12 @@ const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400"] });
 
 export default function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const isFineDesktop = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
+  const [isVisible, setIsVisible] = useState(isFineDesktop);
   const [isView, setIsView] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(isFineDesktop);
 
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
@@ -24,8 +27,8 @@ export default function CustomCursor() {
     const updateDesktopState = () => {
       const shouldEnable = mediaQuery.matches;
       setIsDesktop(shouldEnable);
+      setIsVisible(shouldEnable);
       if (!shouldEnable) {
-        setIsVisible(false);
         setIsHovering(false);
         setIsView(false);
       }
@@ -34,14 +37,16 @@ export default function CustomCursor() {
     updateDesktopState();
     mediaQuery.addEventListener("change", updateDesktopState);
 
-    if (!mediaQuery.matches) {
-      return () => mediaQuery.removeEventListener("change", updateDesktopState);
-    }
+    return () => mediaQuery.removeEventListener("change", updateDesktopState);
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop) return;
 
     const moveCursor = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      if (!isVisible) setIsVisible(true);
+      setIsVisible(true);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -67,17 +72,16 @@ export default function CustomCursor() {
     window.addEventListener("mouseover", handleMouseOver);
 
     return () => {
-      mediaQuery.removeEventListener("change", updateDesktopState);
       window.removeEventListener("mousemove", moveCursor);
       window.removeEventListener("mouseover", handleMouseOver);
     };
-  }, [isVisible, mouseX, mouseY]);
+  }, [isDesktop, mouseX, mouseY]);
 
   if (!isDesktop) return null;
 
   return (
     <motion.div
-      className="hidden md:block pointer-events-none fixed top-0 left-0 z-[999] flex items-center justify-center"
+      className="hidden md:block pointer-events-none fixed top-0 left-0 z-[9999] flex items-center justify-center"
       style={{
         x: cursorX,
         y: cursorY,

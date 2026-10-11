@@ -2,13 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { JetBrains_Mono, Manrope } from "next/font/google";
-import dynamic from "next/dynamic";
 import { useState } from "react";
-
-// Dynamically import the cursor to prevent hydration mismatch
-const CustomCursor = dynamic(() => import("@/components/CustomCursor"), { 
-  ssr: false 
-});
 
 const sans = Manrope({ subsets: ["latin"], weight: ["300", "400", "500", "600", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"] });
@@ -28,8 +22,6 @@ export default function OSLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={`${sans.className} relative min-h-dvh w-full bg-[#EBE9E1] text-[#E43D12] selection:bg-[#EFB11D]/30 cursor-none`}>
       
-      <CustomCursor />
-
       {/* WARM BACKGROUND EFFECTS */}
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(228,61,18,0.05)_0%,rgba(235,233,225,0)_100%)] z-0" />
       <div className="pointer-events-none fixed inset-0 opacity-[0.05] mix-blend-multiply z-0" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />

@@ -18,6 +18,10 @@ export interface Mission {
   impact_metrics?: string[];
   anomaly_report?: AnomalyReport;
   repository_url?: string;
+  github_url?: string;
+  live_url?: string;
+  image_url?: string;
+  gallery?: string[];
 }
 
 export interface CareerNode {
@@ -44,6 +48,7 @@ export const portfolioData = {
   status: "DEPLOYED",
   stack: ["Django", "Python", "SQLite", "Stripe", "React", "Tailwind CSS"],
   directive: "Full-stack movie ticket booking platform with concurrency-safe seat reservations, secure payments, and automated booking confirmations.",
+  github_url: "https://github.com/Rudrakshgupta22/Bookmyshow",
   impact_metrics: [
     "Concurrency-safe real-time seat reservation",
     "Stripe-powered secure payment processing",
@@ -60,6 +65,7 @@ export const portfolioData = {
   status: "DEPLOYED",
   stack: ["React", "JavaScript", "Tailwind CSS", "EmailJS"],
   directive: "Official digital platform for showcasing ELC's departments, flagship events, activities, and organizational presence.",
+  github_url: "https://github.com/Rudrakshgupta22/ELC",
   impact_metrics: [
     "Centralized platform for ELC events and initiatives",
     "Interactive event galleries and media showcase",
@@ -72,6 +78,7 @@ export const portfolioData = {
         status: "OPTIMIZING",
         stack: ["Next.js", "Vercel AI SDK", "Tailwind CSS"],
         directive: "AI-driven deterministic operational GUI.",
+        github_url: "https://github.com/Rudrakshgupta22/PORTFOLIO_OS",
       }
     ] as Mission[],
     

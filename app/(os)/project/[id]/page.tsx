@@ -2,13 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Fraunces, Manrope, Martian_Mono } from "next/font/google";
 import CenterPanel from "@/components/Centralpanel";
-import { portfolioData } from "@/lib/intel";
+import { client } from "@/sanity/lib/client";
+import { groq } from "next-sanity";
 import { MotionStyles, Reveal, Rule, ScrollWords, SplitTitle } from "@/components/ProjectMotion";
+import { portfolioData } from "@/lib/intel";
+import { fromMission, fromSanityProject, getProjects, type ProjectData, type SanityProject } from "@/lib/projects";
 
 export const instant = false;
 
 export async function generateStaticParams() {
-  return portfolioData.missions.tier_1_deployments.map((mission) => ({ id: mission.id }));
+  const projects = await getProjects();
+  return projects.map(({ id }) => ({ id }));
 }
 
 const sans = Manrope({ subsets: ["latin"], weight: ["300", "400", "500", "600"] });
@@ -27,12 +31,39 @@ const label = `${mono.className} text-[10px] uppercase tracking-[0.2em] text-[#2
 
 export default async function ProjectPage({ params }: PageProps<"/project/[id]">) {
   const { id } = await params;
-  const all = portfolioData.missions.tier_1_deployments;
-  const idx = all.findIndex((item) => item.id === id);
-  if (idx === -1) notFound();
 
-  const mission = all[idx];
-  const next = all[(idx + 1) % all.length];
+  const sanityMission = await client.fetch<SanityProject | null>(
+    groq`*[_type == "project" && slug.current == $id][0]{
+      "id": slug.current,
+      title,
+      directive,
+      status,
+      "stack": techStack,
+      impactMetrics,
+      anomalyReport,
+      githubUrl,
+      liveUrl,
+      "imageUrl": mainImage.asset->url,
+      "gallery": gallery[].asset->url
+    }`,
+    { id }
+  );
+  const hardcodedMission = portfolioData.missions.tier_1_deployments.find(
+    (project) => project.id.toLowerCase() === id.toLowerCase(),
+  );
+  const mission: ProjectData | null = sanityMission
+    ? fromSanityProject(sanityMission)
+    : hardcodedMission
+      ? fromMission(hardcodedMission)
+      : null;
+
+  if (!mission) notFound();
+
+  const allProjects = (await getProjects()) ?? [];
+  const stack = mission.stack ?? [];
+  const impactMetrics = mission.impact_metrics ?? [];
+  const idx = allProjects.findIndex((item) => item.id.toLowerCase() === mission.id.toLowerCase());
+  const next = allProjects[(idx + 1) % allProjects.length] || mission;
   const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
@@ -44,7 +75,7 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
       {/* ───────── Title ───────── */}
       <header>
         <div className="flex items-baseline justify-between">
-          <p className={label}>Case study ({pad(idx + 1)}/{pad(all.length)})</p>
+          <p className={label}>Case study ({pad(idx !== -1 ? idx + 1 : 1)}/{pad(allProjects.length)})</p>
           <Link href="/hub" className={`${label} ul pb-1 text-[#2A1610]`}>
             ← All work
           </Link>
@@ -57,22 +88,32 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
           className={`${display.className} mt-10 text-[clamp(3.5rem,13vw,11rem)] font-light leading-[0.88] tracking-[-0.045em] sm:mt-14`}
           style={WONKY}
         />
+        {mission.github_url && (
+          <a
+            href={mission.github_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${mono.className} mt-8 inline-flex items-center gap-3 rounded-full border border-[#2A1610]/20 px-5 py-3 text-[10px] font-medium uppercase tracking-[0.16em] text-[#2A1610] transition-colors hover:border-[#E43D12] hover:bg-[#E43D12] hover:text-[#EBE9E1]`}
+          >
+            GitHub Repository <span aria-hidden>↗</span>
+          </a>
+        )}
       </header>
 
       {/* ───────── Meta strip ───────── */}
       <Reveal delay={500} className="mt-14 grid grid-cols-2 gap-y-8 md:grid-cols-4 md:gap-x-8">
         <div>
           <p className={label}>Status</p>
-          <p className="mt-2 text-sm font-medium capitalize">{mission.status}</p>
+          <p className="mt-2 text-sm font-medium capitalize">{mission.status || "Deployed"}</p>
         </div>
         <div className="col-span-2">
           <p className={label}>Built with</p>
-          <p className="mt-2 text-sm font-medium">{mission.stack.join(", ")}</p>
+          <p className="mt-2 text-sm font-medium">{stack.join(", ")}</p>
         </div>
         <div>
           <p className={label}>Project</p>
           <p className="mt-2 text-sm font-medium">
-            {pad(idx + 1)} of {pad(all.length)}
+            {pad(idx !== -1 ? idx + 1 : 1)} of {pad(allProjects.length)}
           </p>
         </div>
       </Reveal>
@@ -80,12 +121,21 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
       {/* ───────── Visual ───────── */}
       <Reveal delay={150} className="mt-16">
         <div className="relative h-[68vh] min-h-[420px] overflow-hidden rounded-md border border-[#2A1610]/15 bg-[#2A1610]/[0.03]">
-          <CenterPanel
-            activeViewId={mission.id}
-            activeMissionStack={mission.stack}
-            monoClass={mono.className}
-            silver={SILVER}
-          />
+          {mission.image_url ? (
+            <div
+              role="img"
+              aria-label={`${mission.title} project cover`}
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url("${mission.image_url}")` }}
+            />
+          ) : (
+            <CenterPanel
+              activeViewId={mission.id}
+              activeMissionStack={stack}
+              monoClass={mono.className}
+              silver={SILVER}
+            />
+          )}
         </div>
       </Reveal>
 
@@ -107,7 +157,7 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
             className={`${display.className} flex flex-wrap gap-x-8 gap-y-2 text-4xl font-light tracking-[-0.02em] sm:text-6xl`}
             style={WONKY}
           >
-            {mission.stack.map((tech) => (
+            {stack.map((tech: string) => (
               <li
                 key={tech}
                 className="cursor-default transition-colors duration-300 hover:text-[#E43D12] hover:italic"
@@ -119,12 +169,29 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
         </Reveal>
       </div>
 
+      {mission.gallery.length > 0 && (
+        <section className="mt-32" aria-label={`${mission.title} project screenshots`}>
+          <p className={label}>Project screenshots</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {mission.gallery.map((imageUrl, index) => (
+              <div
+                key={`${imageUrl}-${index}`}
+                role="img"
+                aria-label={`${mission.title} screenshot ${index + 1}`}
+                className="aspect-[4/3] overflow-hidden rounded-md border border-[#2A1610]/15 bg-[#2A1610]/[0.03] bg-cover bg-center"
+                style={{ backgroundImage: `url("${imageUrl}")` }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ───────── Impact ───────── */}
-      {mission.impact_metrics && mission.impact_metrics.length > 0 && (
+      {impactMetrics.length > 0 && (
         <div className="mt-32 grid gap-8 md:grid-cols-12 md:gap-0">
           <p className={`${label} md:col-span-3`}>(Impact)</p>
           <ul className="md:col-span-9">
-            {mission.impact_metrics.map((metric, i) => (
+            {impactMetrics.map((metric: string, i: number) => (
               <li key={metric}>
                 <Rule delay={i * 80} />
                 <Reveal delay={i * 80}>
@@ -149,7 +216,7 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
               </li>
             ))}
             <li>
-              <Rule delay={mission.impact_metrics.length * 80} />
+              <Rule delay={impactMetrics.length * 80} />
             </li>
           </ul>
         </div>

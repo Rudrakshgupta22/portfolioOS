@@ -10,14 +10,19 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.91",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^5.31.2",
     "ai": "^7.0.137",
     "framer-motion": "^14.0.0",
     "lucide-react": "^1.54.0",
     "next": "16.4.0",
+    "next-sanity": "^13.3.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-icons": "^5.7.0",
     "resend": "^6.32.1",
+    "sanity": "^5.31.2",
+    "styled-components": "^6.5.3",
     "unicornstudio-react": "^2.2.13"
   },
   "devDependencies": {
