@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Fraunces, Manrope, Martian_Mono } from "next/font/google";
 import CenterPanel from "@/components/Centralpanel";
@@ -122,11 +123,13 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
       <Reveal delay={150} className="mt-16">
         <div className="relative h-[68vh] min-h-[420px] overflow-hidden rounded-md border border-[#2A1610]/15 bg-[#2A1610]/[0.03]">
           {mission.image_url ? (
-            <div
-              role="img"
-              aria-label={`${mission.title} project cover`}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url("${mission.image_url}")` }}
+            <Image
+              src={mission.image_url}
+              alt={`${mission.title} project cover`}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 1152px"
+              className="object-cover"
             />
           ) : (
             <CenterPanel
@@ -176,11 +179,16 @@ export default async function ProjectPage({ params }: PageProps<"/project/[id]">
             {mission.gallery.map((imageUrl, index) => (
               <div
                 key={`${imageUrl}-${index}`}
-                role="img"
-                aria-label={`${mission.title} screenshot ${index + 1}`}
-                className="aspect-[4/3] overflow-hidden rounded-md border border-[#2A1610]/15 bg-[#2A1610]/[0.03] bg-cover bg-center"
-                style={{ backgroundImage: `url("${imageUrl}")` }}
-              />
+                className="relative aspect-[4/3] overflow-hidden rounded-md border border-[#2A1610]/15 bg-[#2A1610]/[0.03]"
+              >
+                <Image
+                  src={imageUrl}
+                  alt={`${mission.title} screenshot ${index + 1}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
             ))}
           </div>
         </section>

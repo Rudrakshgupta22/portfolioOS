@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { Fraunces, Martian_Mono } from "next/font/google";
 import type { ProjectData } from "@/lib/projects";
@@ -67,10 +68,12 @@ function ProjectsContent({ missions }: { missions: ProjectData[] }) {
                   className={`relative overflow-hidden rounded-[1.35rem] bg-gradient-to-br ${coverStyles[index % coverStyles.length]} p-5`}
                 >
                   {mission.image_url && (
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-cover bg-center"
-                      style={{ backgroundImage: `url("${mission.image_url}")` }}
+                    <Image
+                      src={mission.image_url}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      className="object-cover"
                     />
                   )}
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.4),transparent_35%)]" />
