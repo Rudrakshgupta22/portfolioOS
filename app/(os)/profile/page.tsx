@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { Fraunces, Manrope, Martian_Mono } from "next/font/google";
 import Link from "next/link";
+import HeroPortrait3D from "@/components/HeroPortrait3D";
 import {
   FiArrowDownRight,
   FiGithub,
@@ -526,32 +527,41 @@ export default function ProfilePage() {
       
       {/* ───────── 1. HERO ───────── */}
       <section className="relative px-6 pb-24 pt-32 md:px-0">
-        <div className="md:ml-[16%]">
-          <p
-            className={`${mono.className} mb-8 text-[10px] font-medium uppercase tracking-[0.25em] text-[#D6536D]`}
-          >
-            Dossier / Identity
-          </p>
-
-          <h1
-            className={`${display.className} text-[clamp(3.5rem,10vw,10rem)] font-light leading-[0.86] tracking-[-0.045em] text-[#2A1610]`}
-            style={WONKY}
-          >
-            Rudraksh <br />
-            <span className="bg-gradient-to-br from-[#E43D12] via-[#E43D12] to-[#D6536D] bg-clip-text pr-[0.08em] italic text-transparent">
-              Gupta.
-            </span>
-          </h1>
-
-          <div className="mt-16 flex max-w-4xl flex-col gap-8 md:flex-row md:gap-16">
-            <FiArrowDownRight className="shrink-0 text-4xl text-[#E43D12]" />
+        <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(280px,0.85fr)] md:gap-8 lg:gap-14">
+          <div className="order-2 min-w-0 md:order-1">
             <p
-              className={`${display.className} text-2xl font-light leading-[1.35] text-[#2A1610] sm:text-[2rem]`}
+              className={`${mono.className} mb-8 text-[10px] font-medium uppercase tracking-[0.25em] text-[#D6536D]`}
+            >
+              Dossier / Identity
+            </p>
+
+            <h1
+              className={`${display.className} text-[clamp(3.5rem,10vw,10rem)] font-light leading-[0.86] tracking-[-0.045em] text-[#2A1610]`}
               style={WONKY}
             >
-              <span className="italic text-[#D6536D]">&ldquo;Code is not just logic.</span> It is poetry
-              written in the syntax of machines, orchestrating chaos into deterministic, living grace.&rdquo;
-            </p>
+              Rudraksh <br />
+              <span className="bg-gradient-to-br from-[#E43D12] via-[#E43D12] to-[#D6536D] bg-clip-text pr-[0.08em] italic text-transparent">
+                Gupta.
+              </span>
+            </h1>
+
+            <div className="mt-12 flex max-w-4xl flex-col gap-8 md:mt-16 md:flex-row md:gap-10">
+              <FiArrowDownRight className="shrink-0 text-4xl text-[#E43D12]" />
+              <p
+                className={`${display.className} text-2xl font-light leading-[1.35] text-[#2A1610] sm:text-[2rem]`}
+                style={WONKY}
+              >
+                <span className="italic text-[#D6536D]">&ldquo;Code is not just logic.</span> It is poetry
+                written in the syntax of machines, orchestrating chaos into deterministic, living grace.&rdquo;
+              </p>
+            </div>
+          </div>
+
+          <div className="order-1 min-w-0 md:order-2">
+            <HeroPortrait3D
+              monoClass={mono.className}
+              displayClass={display.className}
+            />
           </div>
         </div>
       </section>

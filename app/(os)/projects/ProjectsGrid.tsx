@@ -153,7 +153,7 @@ function ProjectsContent({ missions }: { missions: ProjectData[] }) {
             </h2>
           </div>
           <a
-            href="https://github.com/rudrakshgupta?tab=repositories"
+            href="https://github.com/Rudrakshgupta22?tab=repositories"
             target="_blank"
             rel="noopener noreferrer"
             className={`${mono.className} inline-flex items-center gap-3 rounded-full border border-[#2A1610]/20 px-6 py-4 text-[10px] font-medium uppercase tracking-[0.15em] text-[#2A1610] transition-colors hover:border-[#E43D12] hover:bg-[#E43D12] hover:text-[#EBE9E1]`}
