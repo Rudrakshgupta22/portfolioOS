@@ -9,7 +9,8 @@ export default function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const isFineDesktop = () =>
     typeof window !== "undefined" &&
-    window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
+    window.matchMedia("(min-width: 768px) and (pointer: fine) and (hover: hover)").matches &&
+    !window.matchMedia("(pointer: coarse)").matches;
   const [isVisible, setIsVisible] = useState(isFineDesktop);
   const [isView, setIsView] = useState(false);
   const [isDesktop, setIsDesktop] = useState(isFineDesktop);
@@ -22,10 +23,13 @@ export default function CustomCursor() {
   const cursorY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 768px) and (pointer: fine)");
+    const mediaQueries = [
+      window.matchMedia("(min-width: 768px) and (pointer: fine) and (hover: hover)"),
+      window.matchMedia("(pointer: coarse)"),
+    ];
 
     const updateDesktopState = () => {
-      const shouldEnable = mediaQuery.matches;
+      const shouldEnable = mediaQueries[0].matches && !mediaQueries[1].matches;
       setIsDesktop(shouldEnable);
       setIsVisible(shouldEnable);
       if (!shouldEnable) {
@@ -35,9 +39,9 @@ export default function CustomCursor() {
     };
 
     updateDesktopState();
-    mediaQuery.addEventListener("change", updateDesktopState);
+    mediaQueries.forEach((query) => query.addEventListener("change", updateDesktopState));
 
-    return () => mediaQuery.removeEventListener("change", updateDesktopState);
+    return () => mediaQueries.forEach((query) => query.removeEventListener("change", updateDesktopState));
   }, []);
 
   useEffect(() => {

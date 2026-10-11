@@ -47,7 +47,14 @@ export default function HeroPortrait3D({
   const glareY = useTransform(smoothY, [-0.5, 0.5], [0, 100]);
   const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(239, 177, 29, 0.28) 0%, rgba(228, 61, 18, 0.12) 35%, transparent 70%)`;
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+  function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (
+      e.pointerType !== "mouse" ||
+      !window.matchMedia("(pointer: fine) and (hover: hover)").matches ||
+      window.matchMedia("(pointer: coarse)").matches
+    ) {
+      return;
+    }
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -56,7 +63,7 @@ export default function HeroPortrait3D({
     mouseY.set(y);
   }
 
-  function handleMouseLeave() {
+  function handlePointerLeave() {
     mouseX.set(0);
     mouseY.set(0);
   }
@@ -86,14 +93,14 @@ export default function HeroPortrait3D({
         {/* Main 3D Tilt Container */}
         <motion.div
           ref={cardRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={handlePointerLeave}
           style={{
             rotateX,
             rotateY,
             transformStyle: "preserve-3d",
           }}
-          className="group relative aspect-[16/21] w-full max-w-[320px] cursor-grab active:cursor-grabbing rounded-2xl border border-[#2A1610]/20 bg-[#2A1610] p-3 shadow-[0_28px_60px_-15px_rgba(42,22,16,0.45)] sm:aspect-auto sm:h-[480px] sm:w-[370px]"
+          className="group relative aspect-[16/21] w-full max-w-[320px] touch-manipulation cursor-grab active:cursor-grabbing rounded-2xl border border-[#2A1610]/20 bg-[#2A1610] p-3 shadow-[0_28px_60px_-15px_rgba(42,22,16,0.45)] sm:aspect-auto sm:h-[480px] sm:w-[370px]"
         >
           {/* Outer Offset Wireframe Plane (Back Depth Layer) */}
           <div

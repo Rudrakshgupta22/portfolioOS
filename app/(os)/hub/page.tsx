@@ -1,13 +1,11 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from "framer-motion";
-import { Fraunces, JetBrains_Mono, Manrope } from "next/font/google";
+import { Fraunces, JetBrains_Mono } from "next/font/google";
 import { portfolioData } from "@/lib/intel";
 import Link from "next/link";
 import { FiGithub, FiLinkedin } from "react-icons/fi";
-import HeroPortrait3D from "@/components/HeroPortrait3D";
 
-const sans = Manrope({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const display = Fraunces({
   subsets: ["latin"],
@@ -17,10 +15,6 @@ const display = Fraunces({
 });
 const WONKY = { fontVariationSettings: '"SOFT" 100, "WONK" 1' } as const;
 
-/* Optional: drop a portrait in /public and point this at it.
-   If it exists it becomes the top polaroid of the deck. If not, the deck is just your projects. */
-const PHOTO = "/self.jpeg";
-
 /* ───────────────────────── THE PINBOARD ─────────────────────────
    A little deck of paper cards built from your real deployments.
    • Drag the top card and flick it away — it slides back underneath the pile.
@@ -28,9 +22,7 @@ const PHOTO = "/self.jpeg";
    • "Open ↗" on a card goes to that project. */
 const missions = portfolioData.missions.tier_1_deployments;
 type Mission = (typeof missions)[number];
-type DeckCardData =
-  | { kind: "portrait"; id: string }
-  | { kind: "project"; id: string; m: Mission };
+type DeckCardData = { id: string; m: Mission };
 
 const COVERS = [
   "from-[#1a1d23] via-[#111827] to-[#2a3344]",
@@ -72,8 +64,7 @@ function DeckCard({
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
     setTimeout(() => (moved.current = false), 0);
-    const far =
-      Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 650 || Math.abs(info.offset.y) > 150;
+    const far = Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 650;
     if (far) {
       const dir = info.offset.x >= 0 ? 1 : -1;
       animate(x, dir * 460, { duration: 0.24, ease: "easeOut", onComplete: onNext });
@@ -100,7 +91,7 @@ function DeckCard({
     >
       <motion.div
         data-cursor="Drag"
-        drag={isTop}
+        drag={isTop ? "x" : false}
         dragMomentum={false}
         dragElastic={0.9}
         onDragStart={() => (moved.current = true)}
@@ -108,7 +99,7 @@ function DeckCard({
         whileHover={isTop ? { scale: 1.025 } : undefined}
         whileTap={isTop ? { scale: 1.04 } : undefined}
         style={{ x, y, rotate: tilt }}
-        className="relative h-full w-full touch-none select-none"
+        className="relative h-full w-full touch-manipulation select-none"
       >
         {/* washi tape */}
         <span
@@ -123,29 +114,7 @@ function DeckCard({
           }}
         />
 
-        {card.kind === "portrait" ? (
-          <div className={PAPER}>
-            <div className="h-[80%] overflow-hidden bg-[#0a0b0e]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={PHOTO}
-                alt="Rudraksh Gupta"
-                draggable={false}
-                className="h-full w-full object-cover"
-                style={{ filter: "grayscale(0.3) contrast(1.08) sepia(0.12)" }}
-              />
-            </div>
-            <div className="flex h-[20%] items-end justify-between px-1 pb-1">
-              <span className={`${display.className} text-2xl italic text-[#2A1610]`} style={WONKY}>
-                Rudraksh
-              </span>
-              <span className={`${mono.className} text-[8px] uppercase tracking-[0.18em] text-[#D6536D]`}>
-                AI/ML Architect
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className={PAPER}>
+        <div className={PAPER}>
             <div className={`relative h-[62%] overflow-hidden bg-gradient-to-br ${COVERS[index % COVERS.length]}`}>
               <div
                 className="absolute inset-0 opacity-30"
@@ -156,10 +125,15 @@ function DeckCard({
               />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(207,194,159,0.2),transparent_40%)]" />
               <p
-                className={`${mono.className} absolute left-3 top-3 text-[8px] uppercase tracking-[0.25em] text-[#EBE9E1]/75`}
+                className={`${mono.className} absolute left-3 top-3 max-w-[62%] truncate text-[8px] uppercase tracking-[0.2em] text-[#EBE9E1]/75`}
               >
                 {card.m.stack.slice(0, 3).join(" · ")}
               </p>
+              <span
+                className={`${mono.className} pointer-events-none absolute right-3 top-3 -rotate-[5deg] whitespace-nowrap border border-[#E43D12] bg-[#F6F2E9]/90 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-[#E43D12]`}
+              >
+                {card.m.status}
+              </span>
               <h3
                 className={`${display.className} absolute bottom-3 left-3 right-3 text-[1.9rem] font-light leading-[0.95] tracking-[-0.03em] text-[#EBE9E1]`}
                 style={WONKY}
@@ -181,44 +155,26 @@ function DeckCard({
                   onClick={(e: React.MouseEvent) => {
                     if (moved.current) e.preventDefault();
                   }}
-                  className={`${mono.className} text-[9px] font-bold uppercase tracking-[0.2em] text-[#E43D12] underline-offset-4 hover:underline`}
+                  className={`${mono.className} inline-flex min-h-11 items-center px-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#E43D12] underline-offset-4 hover:underline active:text-[#2A1610]`}
                 >
                   Open ↗
                 </Link>
               </div>
             </div>
 
-            {/* rubber stamp */}
-            <span
-              className={`${mono.className} pointer-events-none absolute bottom-[3.4rem] right-4 -rotate-[9deg] border border-[#E43D12] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.22em] text-[#E43D12] opacity-80 mix-blend-multiply`}
-            >
-              {card.m.status}
-            </span>
-          </div>
-        )}
+        </div>
       </motion.div>
     </motion.div>
   );
 }
 
 function Pinboard() {
-  const [photo, setPhoto] = useState<"loading" | "ok" | "none">("loading");
   const [top, setTop] = useState(0);
   const [used, setUsed] = useState(false);
 
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setPhoto("ok");
-    img.onerror = () => setPhoto("none");
-    img.src = PHOTO;
-  }, []);
-
   const cards: DeckCardData[] = useMemo(
-    () => [
-      ...(photo === "ok" ? [{ kind: "portrait", id: "portrait" } as DeckCardData] : []),
-      ...missions.map((m) => ({ kind: "project", id: m.id, m }) as DeckCardData),
-    ],
-    [photo]
+    () => missions.map((m) => ({ id: m.id, m })),
+    []
   );
   const n = cards.length;
 
@@ -232,7 +188,7 @@ function Pinboard() {
   }, [n]);
 
   const btn =
-    "flex h-9 w-9 items-center justify-center rounded-full border border-[#2A1610]/20 bg-white/50 text-[#2A1610] transition-colors hover:bg-[#E43D12] hover:text-[#EBE9E1]";
+    "flex h-11 w-11 items-center justify-center rounded-full border border-[#2A1610]/20 bg-white/50 text-[#2A1610] transition-colors hover:bg-[#E43D12] hover:text-[#EBE9E1] active:scale-95 active:bg-[#E43D12] active:text-[#EBE9E1]";
 
   return (
     <div
@@ -243,7 +199,7 @@ function Pinboard() {
         if (e.key === "ArrowRight") next();
         if (e.key === "ArrowLeft") prev();
       }}
-      className="relative flex min-h-[460px] w-full flex-shrink-0 flex-col items-center justify-center overflow-hidden rounded-3xl border border-[#2A1610]/10 bg-[#E4DED0] shadow-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#E43D12]/40 lg:min-h-0 lg:w-5/12"
+      className="relative flex min-h-[460px] w-full flex-shrink-0 flex-col items-center justify-center overflow-hidden rounded-3xl border border-[#2A1610]/10 bg-[#E4DED0] shadow-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#E43D12]/40"
     >
       {/* paper grain + soft vignette */}
       <div
@@ -316,85 +272,76 @@ export default function OperatorProfile() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="flex w-full flex-col gap-12"
+      className="mx-auto flex w-full max-w-6xl flex-col gap-12 overflow-x-hidden px-4 pt-32 sm:px-6 sm:pt-40"
     >
-      <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-stretch xl:gap-12">
-        <div className="w-full min-w-0 lg:w-5/12">
-          <HeroPortrait3D
-            monoClass={mono.className}
-            displayClass={display.className}
-          />
-        </div>
+      <div className="grid w-full min-w-0 grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-16">
+          <section className="order-1 w-full lg:col-span-5" aria-label="Project deployment deck">
+            <p className={`${mono.className} mb-5 text-center text-[9px] font-medium uppercase tracking-[0.22em] text-[#D6536D]`}>
+              Project deployment deck
+            </p>
+            <Pinboard />
+          </section>
 
-        <div className="relative z-10 flex w-full min-w-0 flex-col justify-center py-4 lg:w-7/12">
-        
-        <div className="mb-2">
-           <span className={`${mono.className} text-[10px] uppercase tracking-[0.3em] text-[#D6536D] font-bold`}>
-              System Overview
-           </span>
-        </div>
+          <div className="order-2 flex w-full min-w-0 flex-col justify-center py-4 lg:col-span-7">
+            <div className="mb-2">
+              <span className={`${mono.className} text-[10px] font-bold uppercase tracking-[0.3em] text-[#D6536D]`}>
+                System Overview
+              </span>
+            </div>
 
-        {/* Deep Espresso to Vibrant Orange Gradient */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-8 bg-gradient-to-br from-[#2A1610] to-[#E43D12] text-transparent bg-clip-text">
-          Architecting the <br />
-          <span className="italic">Intelligent</span> Web.
-        </h1>
+            <h1 className="mb-8 bg-gradient-to-br from-[#2A1610] to-[#E43D12] bg-clip-text text-4xl font-extrabold leading-[1.1] tracking-tight text-transparent sm:text-5xl md:text-6xl">
+              Architecting the <br />
+              <span className="italic">Intelligent</span> Web.
+            </h1>
 
-        <div className="space-y-6 text-[#2A1610] font-medium leading-relaxed text-sm sm:text-base max-w-2xl">
-          <p>
-            I am an <strong className="text-[#E43D12] font-bold">AI/ML Systems Architect</strong> bridging the gap between complex neural research and reliable, real-world deployment. 
-          </p>
-          <p>
-            With extensive experience in Python ecosystems and edge deployments, I don't just build algorithms—I engineer deterministic, living systems that learn, adapt, and scale. From predictive models to seamless user interfaces, I craft solutions that perform flawlessly in production environments.
-          </p>
-        </div>
+            <div className="max-w-2xl space-y-6 text-sm font-medium leading-relaxed text-[#2A1610] sm:text-base">
+              <p>
+                I am an <strong className="font-bold text-[#E43D12]">AI/ML Systems Architect</strong> bridging the gap between complex neural research and reliable, real-world deployment.
+              </p>
+              <p>
+                With extensive experience in Python ecosystems and edge deployments, I don&apos;t just build algorithms—I engineer deterministic, living systems that learn, adapt, and scale. From predictive models to seamless user interfaces, I craft solutions that perform flawlessly in production environments.
+              </p>
+            </div>
 
-        {/* Metrics Row */}
-        <div className="grid grid-cols-3 gap-4 sm:gap-8 my-10 py-6 border-y border-[#E43D12]/15">
-          <div>
-            <div className="text-2xl sm:text-3xl text-[#2A1610] font-bold mb-1">08+</div>
-            <div className={`${mono.className} text-[9px] uppercase tracking-widest text-[#D6536D] font-bold`}>Tier-1 Deployments</div>
+            <div className="my-10 grid grid-cols-3 gap-3 border-y border-[#E43D12]/15 py-6 sm:gap-8">
+              <div className="min-w-0">
+                <div className="mb-1 text-2xl font-bold text-[#2A1610] sm:text-3xl">08+</div>
+                <div className={`${mono.className} text-[8px] font-bold uppercase tracking-[0.12em] text-[#D6536D] sm:text-[9px] sm:tracking-widest`}>Tier-1 Deployments</div>
+              </div>
+              <div className="min-w-0">
+                <div className="mb-1 text-2xl font-bold text-[#2A1610] sm:text-3xl">99.9%</div>
+                <div className={`${mono.className} text-[8px] font-bold uppercase tracking-[0.12em] text-[#D6536D] sm:text-[9px] sm:tracking-widest`}>System Uptime</div>
+              </div>
+              <div className="min-w-0">
+                <div className="mb-1 text-2xl font-bold text-[#2A1610] sm:text-3xl">L4</div>
+                <div className={`${mono.className} text-[8px] font-bold uppercase tracking-[0.12em] text-[#D6536D] sm:text-[9px] sm:tracking-widest`}>Clearance Level</div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="https://github.com/Rudrakshgupta22"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex min-h-11 items-center justify-center gap-3 overflow-hidden rounded-full border border-[#E43D12]/30 bg-[#E43D12]/5 px-8 py-4 text-[#E43D12] transition-all duration-300 hover:bg-[#E43D12] hover:text-[#EBE9E1] active:scale-95 active:bg-[#E43D12] active:text-[#EBE9E1]"
+              >
+                <FiGithub className="relative z-10 text-lg" />
+                <span className={`${mono.className} relative z-10 text-[10px] font-bold uppercase tracking-[0.2em]`}>Access GitHub</span>
+              </Link>
+
+              <Link
+                href="https://linkedin.com/in/rudraksh-gupta-188890380/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex min-h-11 items-center justify-center gap-3 overflow-hidden rounded-full border border-[#2A1610]/20 bg-[#2A1610]/5 px-8 py-4 text-[#2A1610] transition-all duration-300 hover:bg-[#2A1610] hover:text-[#EBE9E1] active:scale-95 active:bg-[#2A1610] active:text-[#EBE9E1]"
+              >
+                <FiLinkedin className="relative z-10 text-lg" />
+                <span className={`${mono.className} relative z-10 text-[10px] uppercase tracking-[0.2em]`}>Secure Comms</span>
+              </Link>
+            </div>
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl text-[#2A1610] font-bold mb-1">99.9%</div>
-            <div className={`${mono.className} text-[9px] uppercase tracking-widest text-[#D6536D] font-bold`}>System Uptime</div>
-          </div>
-          <div>
-            <div className="text-2xl sm:text-3xl text-[#2A1610] font-bold mb-1">L4</div>
-            <div className={`${mono.className} text-[9px] uppercase tracking-widest text-[#D6536D] font-bold`}>Clearance Level</div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link 
-            href="https://github.com/Rudrakshgupta22" 
-            target="_blank"
-            className="group relative flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-[#E43D12]/30 bg-[#E43D12]/5 hover:bg-[#E43D12] hover:text-[#EBE9E1] transition-all duration-300 overflow-hidden text-[#E43D12]"
-          >
-            <FiGithub className="text-lg relative z-10" />
-            <span className={`${mono.className} text-[10px] uppercase tracking-[0.2em] relative z-10 font-bold`}>Access GitHub</span>
-          </Link>
-
-          <Link 
-            href="https://linkedin.com/in/rudraksh-gupta-188890380/" 
-            target="_blank"
-            className="group relative flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-[#2A1610]/20 bg-[#2A1610]/5 hover:bg-[#2A1610] hover:text-[#EBE9E1] transition-all duration-300 overflow-hidden text-[#2A1610]"
-          >
-            <FiLinkedin className="text-lg relative z-10" />
-            <span className={`${mono.className} text-[10px] uppercase tracking-[0.2em] relative z-10 font-bold`}>Secure Comms</span>
-          </Link>
-        </div>
-
-        </div>
       </div>
 
-      <section className="w-full" aria-label="Project deployment deck">
-        <p className={`${mono.className} mb-5 text-[9px] font-medium uppercase tracking-[0.22em] text-[#D6536D]`}>
-          Project deployment deck
-        </p>
-        <Pinboard />
-      </section>
     </motion.div>
   );
 }

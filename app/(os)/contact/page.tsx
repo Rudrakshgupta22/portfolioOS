@@ -13,7 +13,7 @@ import type { MotionValue } from "framer-motion";
 import { Fraunces, Manrope, Martian_Mono } from "next/font/google";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent, MouseEvent, ReactNode } from "react";
+import type { FormEvent, PointerEvent, ReactNode } from "react";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 /* ───────────────── FONT SYSTEM ───────────────── */
@@ -249,7 +249,7 @@ function InlineLink({
         <button
           type="button"
           onClick={onCopy}
-          className={`${mono.className} ml-4 inline-block rounded-full border border-[#E43D12]/25 bg-[#E43D12]/5 px-3 py-1.5 align-middle text-[9px] font-bold uppercase not-italic leading-none tracking-[0.2em] text-[#E43D12] transition-colors hover:bg-[#E43D12] hover:text-[#EBE9E1]`}
+          className={`${mono.className} ml-4 inline-flex min-h-11 items-center rounded-full border border-[#E43D12]/25 bg-[#E43D12]/5 px-3 py-1.5 align-middle text-[9px] font-bold uppercase not-italic leading-none tracking-[0.2em] text-[#E43D12] transition-colors hover:bg-[#E43D12] hover:text-[#EBE9E1] active:scale-95 active:bg-[#E43D12] active:text-[#EBE9E1]`}
         >
           {copied ? "Copied ✓" : "Copy"}
         </button>
@@ -342,7 +342,14 @@ function Magnetic({ children }: { children: ReactNode }) {
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 220, damping: 16, mass: 0.4 });
   const sy = useSpring(y, { stiffness: 220, damping: 16, mass: 0.4 });
-  const onMove = (e: MouseEvent<HTMLDivElement>) => {
+  const onMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (
+      e.pointerType !== "mouse" ||
+      !window.matchMedia("(pointer: fine) and (hover: hover)").matches ||
+      window.matchMedia("(pointer: coarse)").matches
+    ) {
+      return;
+    }
     const r = e.currentTarget.getBoundingClientRect();
     x.set((e.clientX - (r.left + r.width / 2)) * 0.28);
     y.set((e.clientY - (r.top + r.height / 2)) * 0.28);
@@ -352,7 +359,7 @@ function Magnetic({ children }: { children: ReactNode }) {
     y.set(0);
   };
   return (
-    <motion.div onMouseMove={onMove} onMouseLeave={reset} style={{ x: sx, y: sy }} className="inline-block">
+    <motion.div onPointerMove={onMove} onPointerLeave={reset} style={{ x: sx, y: sy }} className="inline-block">
       {children}
     </motion.div>
   );
@@ -466,7 +473,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className={`flex w-full flex-col overflow-x-clip pb-12 text-[#2A1610] ${sans.className}`}>
+    <div className={`flex w-full flex-col overflow-x-hidden pb-12 text-[#2A1610] ${sans.className}`}>
       
       {/* ───────── 1. HEADER ───────── */}
       <section className="relative px-6 pb-20 pt-40 md:px-0">
@@ -488,7 +495,7 @@ export default function ContactPage() {
 
           <Link
             href="/hub"
-            className="group flex shrink-0 items-center gap-3 self-start rounded-full border border-[#E43D12]/20 bg-[#E43D12]/5 px-6 py-3 transition-all hover:bg-[#E43D12] hover:shadow-xl md:self-auto"
+            className="group flex min-h-11 shrink-0 items-center gap-3 self-start rounded-full border border-[#E43D12]/20 bg-[#E43D12]/5 px-6 py-3 transition-all hover:bg-[#E43D12] hover:shadow-xl active:scale-95 active:bg-[#E43D12] md:self-auto"
           >
             <FiArrowLeft className="text-[#E43D12] transition-colors group-hover:text-[#EBE9E1]" />
             <span
@@ -565,7 +572,7 @@ export default function ContactPage() {
                   <button
                     type="button"
                     onClick={() => setState("idle")}
-                    className={`${mono.className} text-[10px] font-bold uppercase tracking-[0.2em] text-[#E43D12] underline decoration-[#E43D12]/30 underline-offset-4 hover:decoration-[#E43D12]`}
+                    className={`${mono.className} inline-flex min-h-11 items-center px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#E43D12] underline decoration-[#E43D12]/30 underline-offset-4 hover:decoration-[#E43D12] active:text-[#2A1610]`}
                   >
                     Write another
                   </button>
@@ -597,7 +604,7 @@ export default function ContactPage() {
                       type="button"
                       onClick={() => setTopicIdx((i) => (i + 1) % TOPICS.length)}
                       aria-label={`Topic: ${TOPICS[topicIdx]}. Click to change.`}
-                      className="relative inline-block border-b-2 border-dashed border-[#E43D12]/35 align-baseline italic text-[#E43D12] transition-colors hover:border-[#E43D12]"
+                      className="relative inline-block min-h-11 border-b-2 border-dashed border-[#E43D12]/35 px-1 align-baseline italic text-[#E43D12] transition-colors hover:border-[#E43D12] active:text-[#2A1610]"
                     >
                       <AnimatePresence mode="popLayout" initial={false}>
                         <motion.span
@@ -606,7 +613,7 @@ export default function ContactPage() {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: "-55%", opacity: 0 }}
                           transition={{ duration: 0.35, ease: EASE }}
-                          className="inline-block px-1"
+                          className="inline-block px-1 py-2"
                         >
                           {TOPICS[topicIdx]}
                         </motion.span>
@@ -676,7 +683,7 @@ export default function ContactPage() {
                       <button
                         type="submit"
                         disabled={!canSend}
-                        className={`${mono.className} group/send flex items-center gap-4 rounded-full bg-[#E43D12] px-9 py-5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#EBE9E1] transition-all duration-300 hover:shadow-[0_18px_40px_-10px_rgba(228,61,18,0.55)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:shadow-none`}
+                        className={`${mono.className} group/send flex min-h-11 items-center gap-4 rounded-full bg-[#E43D12] px-9 py-5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#EBE9E1] transition-all duration-300 hover:shadow-[0_18px_40px_-10px_rgba(228,61,18,0.55)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:shadow-none`}
                       >
                         {state === "sending" ? "Sending" : "Send it"}
                         <FiArrowRight className="transition-transform duration-500 group-hover/send:-rotate-45" />

@@ -20,7 +20,7 @@ export default function OSLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className={`${sans.className} relative min-h-dvh w-full bg-[#EBE9E1] text-[#E43D12] selection:bg-[#EFB11D]/30 cursor-none`}>
+    <div className={`${sans.className} relative min-h-dvh w-full overflow-x-clip bg-[#EBE9E1] text-[#E43D12] selection:bg-[#EFB11D]/30`}>
       
       {/* WARM BACKGROUND EFFECTS */}
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(228,61,18,0.05)_0%,rgba(235,233,225,0)_100%)] z-0" />
@@ -44,7 +44,7 @@ export default function OSLayout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`group relative px-4 sm:px-5 py-2.5 rounded-full text-[9px] sm:text-[10px] uppercase tracking-[0.15em] transition-all duration-500 whitespace-nowrap overflow-hidden flex-shrink-0 ${
+                  className={`group relative flex min-h-11 flex-shrink-0 items-center overflow-hidden whitespace-nowrap rounded-full px-4 py-2.5 text-[9px] uppercase tracking-[0.15em] transition-all duration-500 sm:px-5 sm:text-[10px] ${
                     isActive
                       ? "bg-[#E43D12] text-[#EBE9E1] font-medium shadow-[0_4px_12px_rgba(228,61,18,0.2),inset_0_1px_2px_rgba(255,255,255,0.2)]"
                       : "text-[#D6536D] hover:text-[#E43D12] border border-transparent hover:bg-[#E43D12]/5"
@@ -61,7 +61,7 @@ export default function OSLayout({ children }: { children: React.ReactNode }) {
            aria-expanded={isMenuOpen}
            aria-controls="mobile-navigation"
            onClick={() => setIsMenuOpen((open) => !open)}
-           className={`${mono.className} md:hidden flex-shrink-0 rounded-full border border-[#E43D12]/20 px-4 py-2 text-[10px] uppercase tracking-[0.15em] text-[#D6536D] transition-colors hover:bg-[#E43D12]/5 hover:text-[#E43D12]`}
+           className={`${mono.className} md:hidden min-h-11 flex-shrink-0 rounded-full border border-[#E43D12]/20 px-4 py-2 text-[10px] uppercase tracking-[0.15em] text-[#D6536D] transition-colors hover:bg-[#E43D12]/5 hover:text-[#E43D12] active:scale-95 active:bg-[#E43D12]/10`}
          >
            Menu
          </button>
@@ -78,7 +78,7 @@ export default function OSLayout({ children }: { children: React.ReactNode }) {
                    key={item.path}
                    href={item.path}
                    onClick={() => setIsMenuOpen(false)}
-                   className={`flex-shrink-0 rounded-xl px-4 py-3 text-[10px] uppercase tracking-[0.15em] transition-colors ${
+                   className={`min-h-11 flex-shrink-0 rounded-xl px-4 py-3 text-[10px] uppercase tracking-[0.15em] transition-colors active:scale-[0.99] ${
                      isActive
                        ? "bg-[#E43D12] text-[#EBE9E1] font-medium"
                        : "text-[#D6536D] hover:bg-[#E43D12]/5 hover:text-[#E43D12]"
@@ -91,7 +91,7 @@ export default function OSLayout({ children }: { children: React.ReactNode }) {
          </nav>
       </header>
 
-      <main className="relative z-10 pt-28 pb-12 px-6 lg:px-12 max-w-7xl mx-auto h-full min-h-screen flex flex-col">
+      <main className="relative z-10 mx-auto flex h-full min-h-screen w-full max-w-7xl flex-col overflow-x-clip px-6 pb-12 pt-28 lg:px-12">
         {children}
       </main>
     </div>

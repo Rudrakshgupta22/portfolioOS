@@ -4,6 +4,7 @@ import { useRef } from "react";
 import {
   motion,
   useScroll,
+  useSpring,
   useTransform,
   type MotionValue,
 } from "framer-motion";
@@ -177,10 +178,12 @@ function Compass({
   dialRotate,
   needleRotate,
   blockLabel,
+  className,
 }: {
   dialRotate: MotionValue<number>;
   needleRotate: MotionValue<number>;
   blockLabel: MotionValue<string>;
+  className: string;
 }) {
   const heading = useTransform(
     needleRotate,
@@ -188,12 +191,26 @@ function Compass({
   );
 
   return (
-    <div className="relative aspect-square w-[min(74vh,34rem)]">
-      <motion.div style={{ rotate: dialRotate }} className="absolute inset-0 will-change-transform">
+    <div className={`relative aspect-square ${className}`}>
+      <motion.div
+        style={{
+          rotate: dialRotate,
+          transformBox: "fill-box",
+          transformOrigin: "center",
+        }}
+        className="absolute inset-0 will-change-transform"
+      >
         <Dial />
       </motion.div>
 
-      <motion.div style={{ rotate: needleRotate }} className="absolute inset-[6%] will-change-transform">
+      <motion.div
+        style={{
+          rotate: needleRotate,
+          transformBox: "fill-box",
+          transformOrigin: "center",
+        }}
+        className="absolute inset-[6%] will-change-transform"
+      >
         <Needle />
       </motion.div>
 
@@ -496,30 +513,36 @@ export default function ProfilePage() {
     target: trackRef,
     offset: ["start start", "end end"],
   });
+  const progress = useSpring(visible, {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.5,
+    restDelta: 0.001,
+  });
   
   // Replicating exactly: `tl.to("#pin-windmill-svg", { rotateZ: 900 });`
-  const needleRotate = useTransform(visible, [0, 1], [-35, 865]); 
+  const needleRotate = useTransform(progress, [0, 1], [-35, 865]); 
   // Counter-rotating the dial gently for parallax
-  const dialRotate = useTransform(visible, [0, 1], [0, -90]);
+  const dialRotate = useTransform(progress, [0, 1], [0, -90]);
 
-  const blockLabel = useTransform(visible, (progress) =>
-    `BLOCK 0${Math.min(4, Math.floor(progress * PHILOSOPHY_BLOCKS.length) + 1)} / 04`
+  const blockLabel = useTransform(progress, (value) =>
+    `BLOCK 0${Math.min(4, Math.floor(value * PHILOSOPHY_BLOCKS.length) + 1)} / 04`
   );
 
   // --- HARD-PINNED OPACITY MATH ---
   // Guarantees each block crossfades perfectly without overlapping
-  const o1 = useTransform(visible, [0, 0.15, 0.25], [1, 1, 0]);
-  const o2 = useTransform(visible, [0.2, 0.25, 0.4, 0.5], [0, 1, 1, 0]);
-  const o3 = useTransform(visible, [0.45, 0.5, 0.65, 0.75], [0, 1, 1, 0]);
-  const o4 = useTransform(visible, [0.7, 0.75, 1], [0, 1, 1]);
+  const o1 = useTransform(progress, [0, 0.15, 0.25], [1, 1, 0]);
+  const o2 = useTransform(progress, [0.2, 0.25, 0.4, 0.5], [0, 1, 1, 0]);
+  const o3 = useTransform(progress, [0.45, 0.5, 0.65, 0.75], [0, 1, 1, 0]);
+  const o4 = useTransform(progress, [0.7, 0.75, 1], [0, 1, 1]);
   const opacities = [o1, o2, o3, o4];
 
   // --- HARD-PINNED Y-TRANSLATION MATH ---
   // Guarantees the text physically "pops up" into view then slides away
-  const y1 = useTransform(visible, [0, 0.15, 0.25], [0, 0, -40]);
-  const y2 = useTransform(visible, [0.2, 0.25, 0.4, 0.5], [40, 0, 0, -40]);
-  const y3 = useTransform(visible, [0.45, 0.5, 0.65, 0.75], [40, 0, 0, -40]);
-  const y4 = useTransform(visible, [0.7, 0.75, 1], [40, 0, 0]);
+  const y1 = useTransform(progress, [0, 0.15, 0.25], [0, 0, -40]);
+  const y2 = useTransform(progress, [0.2, 0.25, 0.4, 0.5], [40, 0, 0, -40]);
+  const y3 = useTransform(progress, [0.45, 0.5, 0.65, 0.75], [40, 0, 0, -40]);
+  const y4 = useTransform(progress, [0.7, 0.75, 1], [40, 0, 0]);
   const ys = [y1, y2, y3, y4];
 
   return (
@@ -567,10 +590,10 @@ export default function ProfilePage() {
       </section>
 
       {/* ───────── 2. NEW GSAP-STYLE PINNED SCROLL SECTION ───────── */}
-      <section ref={trackRef} className="relative h-[400vh] w-full border-t border-[#E43D12]/20">
+      <section ref={trackRef} className="relative h-[400svh] w-full border-t border-[#E43D12]/20">
         
         {/* The entire viewport is locked into a sticky container */}
-        <div className="sticky top-0 flex h-screen w-full items-center overflow-hidden">
+        <div className="sticky top-0 flex h-svh w-full items-center overflow-hidden">
           
           {/* LEFT: Absolutely Stacked Texts (0% chance of overlapping bounds) */}
           <div className="relative z-10 flex h-full w-full items-center px-6 md:ml-[16%] md:w-[45%]">
@@ -599,9 +622,14 @@ export default function ProfilePage() {
           </div>
 
           {/* RIGHT: Pinned Compass rotating exactly 900 deg as requested */}
-          <div className="pointer-events-none absolute right-[-10vw] flex items-center justify-center md:right-[5vw]">
-            <motion.div className="opacity-[0.10] md:opacity-[0.12]">
-              <Compass dialRotate={dialRotate} needleRotate={needleRotate} blockLabel={blockLabel} />
+          <div className="pointer-events-none absolute right-[-8vw] top-1/2 flex -translate-y-1/2 items-center justify-center md:right-[5vw] md:top-auto md:translate-y-0">
+            <motion.div className="opacity-[0.035] md:opacity-[0.12]">
+              <Compass
+                dialRotate={dialRotate}
+                needleRotate={needleRotate}
+                blockLabel={blockLabel}
+                className="w-[min(58vw,20rem)] md:w-[min(74vh,34rem)]"
+              />
             </motion.div>
           </div>
 

@@ -483,7 +483,7 @@ export default function PremiumIntro({ onEnter, photoSrc }: PremiumIntroProps) {
               aria-label={`Show ${c.label}`}
               aria-current={i === idx}
               onClick={() => goTo(i)}
-              className="group flex h-6 items-center focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#cfc29f]"
+              className="group flex min-h-11 min-w-11 items-center justify-center px-2 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#cfc29f]"
             >
               <span
                 className={`block h-px transition-all duration-500 ${
@@ -512,7 +512,7 @@ export default function PremiumIntro({ onEnter, photoSrc }: PremiumIntroProps) {
           autoFocus
           onClick={onEnter}
           whileTap={{ scale: 0.98 }}
-          className={`${mono.className} group relative overflow-hidden rounded-full border border-white/15 bg-white/[0.04] px-8 py-3.5 text-[11px] font-medium uppercase tracking-widest text-[#ebe8e2] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] transition-colors duration-300 hover:border-white/30 hover:bg-white/[0.09] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#cfc29f] sm:px-10`}
+          className={`${mono.className} group relative min-h-11 touch-manipulation overflow-hidden rounded-full border border-white/15 bg-white/[0.04] px-8 py-3.5 text-[11px] font-medium uppercase tracking-widest text-[#ebe8e2] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] transition-colors duration-300 hover:border-white/30 hover:bg-white/[0.09] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#cfc29f] sm:px-10`}
         >
           <span
             aria-hidden

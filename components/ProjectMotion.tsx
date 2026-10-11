@@ -110,6 +110,7 @@ export function SplitTitle({
                 fontStyle: italicFrom >= 0 && i >= italicFrom ? "italic" : "normal",
               } as CSSProperties
             }
+            className="inline-block max-w-full break-words"
           >
             {w}
           </span>

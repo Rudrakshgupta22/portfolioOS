@@ -29,7 +29,7 @@ function ProjectsContent({ missions }: { missions: ProjectData[] }) {
   const { show, hide } = useCursorPreview(); 
 
   return (
-    <div className="relative left-1/2 -mt-28 w-screen -translate-x-1/2 overflow-x-clip text-[#E43D12]">
+    <div className="relative left-1/2 -mt-28 w-screen -translate-x-1/2 overflow-x-hidden text-[#E43D12]">
       <section className="px-6 pt-48 md:px-0 md:pt-64">
         <p className={`${mono.className} text-[10px] uppercase tracking-[0.2em] text-[#D6536D] font-bold md:ml-[16%]`}>
           Deployment / Portfolio
@@ -128,7 +128,7 @@ function ProjectsContent({ missions }: { missions: ProjectData[] }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onMouseEnter={hide}
-                    className={`${mono.className} inline-flex items-center gap-2 rounded-full border border-[#2A1610]/20 px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.15em] text-[#2A1610] transition-colors hover:border-[#E43D12] hover:bg-[#E43D12] hover:text-[#EBE9E1]`}
+                    className={`${mono.className} inline-flex min-h-11 items-center gap-2 rounded-full border border-[#2A1610]/20 px-4 py-3 text-[9px] font-medium uppercase tracking-[0.15em] text-[#2A1610] transition-colors hover:border-[#E43D12] hover:bg-[#E43D12] hover:text-[#EBE9E1] active:scale-95 active:border-[#E43D12] active:bg-[#E43D12] active:text-[#EBE9E1]`}
                   >
                     GitHub <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
                   </a>
@@ -156,7 +156,7 @@ function ProjectsContent({ missions }: { missions: ProjectData[] }) {
             href="https://github.com/Rudrakshgupta22?tab=repositories"
             target="_blank"
             rel="noopener noreferrer"
-            className={`${mono.className} inline-flex items-center gap-3 rounded-full border border-[#2A1610]/20 px-6 py-4 text-[10px] font-medium uppercase tracking-[0.15em] text-[#2A1610] transition-colors hover:border-[#E43D12] hover:bg-[#E43D12] hover:text-[#EBE9E1]`}
+            className={`${mono.className} inline-flex min-h-11 items-center gap-3 rounded-full border border-[#2A1610]/20 px-6 py-4 text-[10px] font-medium uppercase tracking-[0.15em] text-[#2A1610] transition-colors hover:border-[#E43D12] hover:bg-[#E43D12] hover:text-[#EBE9E1] active:scale-95 active:border-[#E43D12] active:bg-[#E43D12] active:text-[#EBE9E1]`}
           >
             View Full Archive on GitHub <ArrowUpRight aria-hidden className="h-4 w-4" />
           </a>

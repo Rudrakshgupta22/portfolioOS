@@ -19,7 +19,7 @@ export default function ClosingCTA() {
         <div className="mt-10 flex flex-wrap gap-4">
           <Link
             href="/contact"
-            className={`${mono.className} inline-flex items-center gap-2 rounded-full border border-[#cfc29f]/30 bg-[#cfc29f]/10 px-6 py-3 text-[10px] uppercase tracking-[0.22em] text-[#cfc29f] transition-all duration-500 hover:scale-[1.02]`}
+            className={`${mono.className} inline-flex min-h-11 items-center gap-2 rounded-full border border-[#cfc29f]/30 bg-[#cfc29f]/10 px-6 py-3 text-[10px] uppercase tracking-[0.22em] text-[#cfc29f] transition-all duration-500 hover:scale-[1.02] active:scale-95`}
           >
             Start a conversation
             <ArrowRight className="h-4 w-4" strokeWidth={1.6} />
@@ -27,7 +27,7 @@ export default function ClosingCTA() {
 
           <Link
             href="/hub"
-            className={`${mono.className} inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-6 py-3 text-[10px] uppercase tracking-[0.22em] text-[#ebe8e2] transition-all duration-500 hover:border-[#cfc29f]/40 hover:text-[#cfc29f]`}
+            className={`${mono.className} inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-6 py-3 text-[10px] uppercase tracking-[0.22em] text-[#ebe8e2] transition-all duration-500 hover:border-[#cfc29f]/40 hover:text-[#cfc29f] active:scale-95`}
           >
             Return to hub
           </Link>
